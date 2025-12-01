@@ -1,54 +1,49 @@
-# This is a basic workflow to help you get started with Actions
+name: Deploy React / Vite App to GitHub Pages
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
-
-  # Allows you to run this workflow manually from the Actions tab
+    branches: ["main"]
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  deploy:
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
-      
-        -name: Setup Node.js
-          uses: actions/setup-node@v6
-          with:
-            node-version: 'lts/*'
-            cache: 'npm'
-  
-        - name: Install dependencies
-          run: npm ci
-  
-        - name: Build static site
-          run: npm run build       # or `vite build` if using Vite
-  
-        - name: Setup GitHub Pages
-          uses: actions/configure-pages@v5
-  
-        - name: Upload static files
-          uses: actions/upload-pages-artifact@v4
-          with:
-            path: ./build          # or `./dist` if Vite outputs there
-  
-        - name: Deploy to GitHub Pages
-          id: deployment
-          uses: actions/deploy-pages@v4
-  
-      environment:
-        name: github-pages
-        url: ${{ steps.deployment.outputs.page_url }}
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build static site
+        run: npm run build   # or `vite build` if you use Vite
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload static files
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./dist      # change to ./dist if Vite outputs to dist/
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
